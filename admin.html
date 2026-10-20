@@ -169,6 +169,31 @@ const ENDPOINT = "https://script.google.com/macros/s/AKfycbwIqMzjCGDeKz3Ys9sqMgU
 let claveGuardada = "";
 let debounceTimer = null;
 
+// Apps Script redirige internamente (de script.google.com a
+// script.googleusercontent.com) y fetch() a veces bloquea esa redirección
+// por CORS antes de llegar al destino final, aunque este sí tenga los
+// permisos correctos. XMLHttpRequest maneja esa redirección distinto y
+// evita el bloqueo — por eso lo usamos acá en vez de fetch().
+function xhrGetJson(url) {
+  return new Promise(function (resolve, reject) {
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.onload = function () {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          resolve(JSON.parse(xhr.responseText));
+        } catch (e) {
+          reject(e);
+        }
+      } else {
+        reject(new Error("HTTP " + xhr.status));
+      }
+    };
+    xhr.onerror = function () { reject(new Error("Error de red")); };
+    xhr.send();
+  });
+}
+
 document.getElementById("btnEntrar").addEventListener("click", function () {
   entrar();
 });
@@ -186,8 +211,7 @@ async function entrar() {
   msg.textContent = "";
 
   try {
-    const resp = await fetch(`${ENDPOINT}?modo=admin&clave=${encodeURIComponent(clave)}&q=`);
-    const data = await resp.json();
+    const data = await xhrGetJson(`${ENDPOINT}?modo=admin&clave=${encodeURIComponent(clave)}&q=`);
 
     if (data.error) {
       msg.textContent = "Clave incorrecta.";
@@ -214,8 +238,7 @@ document.getElementById("busqueda").addEventListener("input", function () {
 
 async function buscar(q) {
   try {
-    const resp = await fetch(`${ENDPOINT}?modo=admin&clave=${encodeURIComponent(claveGuardada)}&q=${encodeURIComponent(q)}`);
-    const data = await resp.json();
+    const data = await xhrGetJson(`${ENDPOINT}?modo=admin&clave=${encodeURIComponent(claveGuardada)}&q=${encodeURIComponent(q)}`);
     if (data.error) return;
     renderResultados(data.resultados || []);
   } catch (e) {
