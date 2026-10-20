@@ -54,32 +54,6 @@
     margin-top:10px;
     line-height:1.4;
   }
-  .pie-info{
-    width:100%;
-    max-width:560px;
-    margin-top:4px;
-    text-align:center;
-  }
-  .pie-info summary{
-    font-size:12px;
-    color:var(--muted);
-    cursor:pointer;
-    list-style:none;
-  }
-  .pie-info summary::-webkit-details-marker{display:none;}
-  .pie-info summary:before{content:"Más información";}
-  .pie-info[open] summary:before{content:"Ocultar información";}
-  .pie-info p{
-    font-size:12px;
-    color:var(--muted);
-    line-height:1.5;
-    text-align:left;
-    margin:10px 0 0;
-    padding:12px 14px;
-    background:#FBFCFE;
-    border:1px solid var(--border);
-    border-radius:10px;
-  }
   .razon{
     width:100%;
     max-width:560px;
@@ -229,10 +203,22 @@
   }
   .estado.error{color:#B3261E;}
   footer{
+    width:100%;
+    max-width:560px;
     margin-top:12px;
     font-size:12px;
     color:var(--muted);
     text-align:center;
+  }
+  footer p{margin:0;}
+  footer .pie-largo{
+    margin-top:10px;
+    text-align:left;
+    line-height:1.5;
+    padding:12px 14px;
+    background:#FBFCFE;
+    border:1px solid var(--border);
+    border-radius:10px;
   }
 </style>
 </head>
@@ -270,6 +256,7 @@
       <div class="dato-valor" id="posicion">—</div>
     </div>
   </div>
+  <div class="nota-corta">Estimación informativa basada en los comprobantes registrados en ARCA a la fecha de consulta. No reemplaza la liquidación de la declaración jurada.</div>
 </div>
 
 <div id="cardAjustes" class="card" style="display:none;">
@@ -296,16 +283,12 @@
 
   <button class="boton-guardar" id="btnGuardar">Guardar</button>
   <div class="mensaje-guardado" id="mensajeGuardado"></div>
-
-  <div class="nota-corta">Estimación informativa basada en los comprobantes registrados en ARCA a la fecha de consulta. No reemplaza la liquidación de la declaración jurada.</div>
 </div>
 
-<details class="pie-info">
-  <summary></summary>
-  <p>La información surge de los comprobantes emitidos y recibidos registrados en ARCA, que pueden demorar entre 24 y 48 hs o más en estar disponibles. No incluye saldos a favor de períodos anteriores, pagos a cuenta no informados ni ajustes por créditos fiscales no computables. Los importes que cargues en "Tus datos" se consideran declarados por vos y quedan sujetos a verificación con la documentación respaldatoria. El importe definitivo es el que determine Estudio Kern al confeccionar la declaración jurada del período. Esta herramienta tiene carácter orientativo y no constituye asesoramiento ni liquidación definitiva.</p>
-</details>
-
-<footer>Estudio Kern — información actualizada automáticamente</footer>
+<footer>
+  <p>Estudio Kern — información actualizada automáticamente</p>
+  <p class="pie-largo">La información surge de los comprobantes emitidos y recibidos registrados en ARCA, que pueden demorar entre 24 y 48 hs o más en estar disponibles. No incluye saldos a favor de períodos anteriores, pagos a cuenta no informados ni ajustes por créditos fiscales no computables. Los importes que cargues en "Tus datos" se consideran declarados por vos y quedan sujetos a verificación con la documentación respaldatoria. El importe definitivo es el que determine Estudio Kern al confeccionar la declaración jurada del período. Esta herramienta tiene carácter orientativo y no constituye asesoramiento ni liquidación definitiva.</p>
+</footer>
 
 <!--
   Formulario oculto que manda los ajustes a un Google Form en vez de a
