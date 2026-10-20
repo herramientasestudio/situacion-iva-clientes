@@ -315,8 +315,15 @@ async function cargar() {
   }
 
   try {
-    const resp = await fetch(`${ENDPOINT}?modo=cliente&c=${encodeURIComponent(token)}`);
-    if (!resp.ok) throw new Error("Error de conexión");
+    // Lee el archivo estático propio (mismo sitio, sin CORS ni login de
+    // Google) que el Tablero publica solo cada hora con los datos de cada
+    // cliente, nombrado con su token.
+    const resp = await fetch(`./data/${encodeURIComponent(token)}.json`, { cache: "no-store" });
+    if (!resp.ok) {
+      estadoEl.textContent = "No pudimos encontrar tu información. Pedí al estudio que revise tu link.";
+      estadoEl.classList.add("error");
+      return;
+    }
     const data = await resp.json();
 
     if (data.error) {
