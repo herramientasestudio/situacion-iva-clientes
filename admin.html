@@ -165,34 +165,17 @@
 </div>
 
 <script>
-const ENDPOINT = "https://script.google.com/macros/s/AKfycbwIqMzjCGDeKz3Ys9sqMgUvieDkczh_7tUecpV5qloBt4RUUVR83K3j-6lp00Zj-guw/exec";
-let claveGuardada = "";
-let debounceTimer = null;
+// Clave que pediste para entrar al panel. Tiene que coincidir con
+// CLAVE_ADMIN_IVA en EndpointCliente.gs.
+const CLAVE_ADMIN = "Estudio.2026";
 
-// Apps Script redirige internamente (de script.google.com a
-// script.googleusercontent.com) y fetch() a veces bloquea esa redirección
-// por CORS antes de llegar al destino final, aunque este sí tenga los
-// permisos correctos. XMLHttpRequest maneja esa redirección distinto y
-// evita el bloqueo — por eso lo usamos acá en vez de fetch().
-function xhrGetJson(url) {
-  return new Promise(function (resolve, reject) {
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", url, true);
-    xhr.onload = function () {
-      if (xhr.status >= 200 && xhr.status < 300) {
-        try {
-          resolve(JSON.parse(xhr.responseText));
-        } catch (e) {
-          reject(e);
-        }
-      } else {
-        reject(new Error("HTTP " + xhr.status));
-      }
-    };
-    xhr.onerror = function () { reject(new Error("Error de red")); };
-    xhr.send();
-  });
-}
+// El Tablero publica, cada vez que corre publicarJsonClientes(), un único
+// archivo con todos los clientes RI y sus links. Lo leemos directo del
+// propio sitio (mismo origen), así que no hay login de Google ni CORS de
+// por medio — a diferencia de antes, que llamábamos a Apps Script.
+const ARCHIVO_INDICE = "./data/_admin_9e5aa887a25acb59e1744953078dc90d.json";
+
+let todosLosClientes = [];
 
 document.getElementById("btnEntrar").addEventListener("click", function () {
   entrar();
@@ -207,44 +190,39 @@ async function entrar() {
   const btn = document.getElementById("btnEntrar");
   if (!clave) return;
 
+  if (clave !== CLAVE_ADMIN) {
+    msg.textContent = "Clave incorrecta.";
+    return;
+  }
+
   btn.disabled = true;
   msg.textContent = "";
 
   try {
-    const data = await xhrGetJson(`${ENDPOINT}?modo=admin&clave=${encodeURIComponent(clave)}&q=`);
+    const resp = await fetch(ARCHIVO_INDICE, { cache: "no-store" });
+    if (!resp.ok) throw new Error("HTTP " + resp.status);
+    const data = await resp.json();
 
-    if (data.error) {
-      msg.textContent = "Clave incorrecta.";
-      btn.disabled = false;
-      return;
-    }
-
-    claveGuardada = clave;
+    todosLosClientes = data.resultados || [];
     document.getElementById("cardClave").style.display = "none";
     document.getElementById("buscador").style.display = "block";
     document.getElementById("busqueda").focus();
-    renderResultados(data.resultados || []);
+    renderResultados(todosLosClientes);
   } catch (e) {
-    msg.textContent = "No se pudo conectar. Probá de nuevo.";
+    msg.textContent = "No se pudo cargar la lista. Probá de nuevo en un momento.";
     btn.disabled = false;
   }
 }
 
 document.getElementById("busqueda").addEventListener("input", function () {
-  clearTimeout(debounceTimer);
-  const q = this.value;
-  debounceTimer = setTimeout(function () { buscar(q); }, 300);
+  const q = this.value.toLowerCase().trim();
+  const filtrados = !q
+    ? todosLosClientes
+    : todosLosClientes.filter(function (c) {
+        return c.razonSocial.toLowerCase().indexOf(q) !== -1;
+      });
+  renderResultados(filtrados);
 });
-
-async function buscar(q) {
-  try {
-    const data = await xhrGetJson(`${ENDPOINT}?modo=admin&clave=${encodeURIComponent(claveGuardada)}&q=${encodeURIComponent(q)}`);
-    if (data.error) return;
-    renderResultados(data.resultados || []);
-  } catch (e) {
-    // silencioso: se puede reintentar escribiendo de nuevo
-  }
-}
 
 function renderResultados(lista) {
   const cont = document.getElementById("resultados");
