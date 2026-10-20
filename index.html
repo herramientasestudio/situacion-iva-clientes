@@ -252,6 +252,14 @@
       <div class="dato-valor" id="compras">—</div>
     </div>
     <div>
+      <div class="dato-label">IVA Débito Fiscal</div>
+      <div class="dato-valor" id="ivaDF">—</div>
+    </div>
+    <div>
+      <div class="dato-label">IVA Crédito Fiscal</div>
+      <div class="dato-valor" id="ivaCF">—</div>
+    </div>
+    <div>
       <div class="dato-label">Posición</div>
       <div class="dato-valor" id="posicion">—</div>
     </div>
@@ -379,6 +387,8 @@ async function cargar() {
 
     document.getElementById("ventas").textContent = formatMoney(data.ventasMes);
     document.getElementById("compras").textContent = formatMoney(data.comprasMes);
+    document.getElementById("ivaDF").textContent = formatMoney(data.ivaDF);
+    document.getElementById("ivaCF").textContent = formatMoney(data.ivaCF);
     pintarPosicion(document.getElementById("posicion"), data.posicion);
 
     document.getElementById("actualizado").textContent = data.actualizado
