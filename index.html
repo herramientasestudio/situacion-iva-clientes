@@ -262,6 +262,23 @@
 
 <footer>Estudio Kern — información actualizada automáticamente</footer>
 
+<!--
+  Formulario oculto que manda los ajustes a un Google Form en vez de a
+  Apps Script directo. Los Forms de Google sí aceptan envíos sin login,
+  así que esto evita el bloqueo de CORS que tenía el endpoint viejo. Del
+  otro lado, un trigger en el Tablero toma cada respuesta y la guarda en
+  AjustesCliente — el cliente nunca ve este formulario.
+-->
+<iframe name="iframeGuardarOculto" style="display:none;"></iframe>
+<form id="formGuardarOculto"
+      action="https://docs.google.com/forms/d/e/1FAIpQLSfBdwj1JtNY_lUHE9g936OUuRXCJQHc1NAlPQzSlfQtq2rgJg/formResponse"
+      method="POST" target="iframeGuardarOculto" style="display:none;">
+  <input type="text" name="entry.1914020428" id="campoFormToken">
+  <input type="text" name="entry.563892823" id="campoFormPercepciones">
+  <input type="text" name="entry.1766859229" id="campoFormRetenciones">
+  <input type="text" name="entry.1787287819" id="campoFormIvaAduanero">
+</form>
+
 <script>
 // URL del endpoint del Tablero Situación de Clientes (Apps Script)
 const ENDPOINT = "https://script.google.com/macros/s/AKfycbwIqMzjCGDeKz3Ys9sqMgUvieDkczh_7tUecpV5qloBt4RUUVR83K3j-6lp00Zj-guw/exec";
