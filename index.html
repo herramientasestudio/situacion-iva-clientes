@@ -283,6 +283,14 @@
     <label for="ivaAduanero">IVA Aduanero</label>
     <input type="number" id="ivaAduanero" inputmode="decimal" step="0.01" placeholder="0,00">
   </div>
+  <div class="renglon">
+    <label for="saldoFavorTecnico">Saldo a favor técnico</label>
+    <input type="number" id="saldoFavorTecnico" inputmode="decimal" step="0.01" placeholder="0,00">
+  </div>
+  <div class="renglon">
+    <label for="saldoFavorLibre">Saldo a favor de libre disponibilidad</label>
+    <input type="number" id="saldoFavorLibre" inputmode="decimal" step="0.01" placeholder="0,00">
+  </div>
 
   <div class="final">
     <div class="dato-label">Posición final</div>
@@ -313,6 +321,8 @@
   <input type="text" name="entry.563892823" id="campoFormPercepciones">
   <input type="text" name="entry.1766859229" id="campoFormRetenciones">
   <input type="text" name="entry.1787287819" id="campoFormIvaAduanero">
+  <input type="text" name="entry.1507027178" id="campoFormSaldoFavorTecnico">
+  <input type="text" name="entry.578238549" id="campoFormSaldoFavorLibre">
 </form>
 
 <script>
@@ -344,11 +354,13 @@ function recalcularLocal() {
   const perc = parseFloat(document.getElementById("percepciones").value) || 0;
   const ret = parseFloat(document.getElementById("retenciones").value) || 0;
   const aduana = parseFloat(document.getElementById("ivaAduanero").value) || 0;
-  const final = base - perc - ret - aduana;
+  const saldoTecnico = parseFloat(document.getElementById("saldoFavorTecnico").value) || 0;
+  const saldoLibre = parseFloat(document.getElementById("saldoFavorLibre").value) || 0;
+  const final = base - perc - ret - aduana - saldoTecnico - saldoLibre;
   pintarPosicion(document.getElementById("posicionFinal"), final);
 }
 
-["percepciones", "retenciones", "ivaAduanero"].forEach(function (id) {
+["percepciones", "retenciones", "ivaAduanero", "saldoFavorTecnico", "saldoFavorLibre"].forEach(function (id) {
   document.addEventListener("DOMContentLoaded", function () {
     document.getElementById(id).addEventListener("input", recalcularLocal);
   });
@@ -400,6 +412,8 @@ async function cargar() {
     document.getElementById("percepciones").value = data.percepciones ? data.percepciones : "";
     document.getElementById("retenciones").value = data.retenciones ? data.retenciones : "";
     document.getElementById("ivaAduanero").value = data.ivaAduanero ? data.ivaAduanero : "";
+    document.getElementById("saldoFavorTecnico").value = data.saldoFavorTecnico ? data.saldoFavorTecnico : "";
+    document.getElementById("saldoFavorLibre").value = data.saldoFavorLibre ? data.saldoFavorLibre : "";
     pintarPosicion(document.getElementById("posicionFinal"), data.posicionFinal);
 
     estadoEl.style.display = "none";
@@ -409,6 +423,8 @@ async function cargar() {
     document.getElementById("percepciones").addEventListener("input", recalcularLocal);
     document.getElementById("retenciones").addEventListener("input", recalcularLocal);
     document.getElementById("ivaAduanero").addEventListener("input", recalcularLocal);
+    document.getElementById("saldoFavorTecnico").addEventListener("input", recalcularLocal);
+    document.getElementById("saldoFavorLibre").addEventListener("input", recalcularLocal);
 
     document.getElementById("btnGuardar").addEventListener("click", function () {
       guardarAjustes(token);
@@ -429,6 +445,8 @@ function guardarAjustes(token) {
   const percepciones = parseFloat(document.getElementById("percepciones").value) || 0;
   const retenciones = parseFloat(document.getElementById("retenciones").value) || 0;
   const ivaAduanero = parseFloat(document.getElementById("ivaAduanero").value) || 0;
+  const saldoFavorTecnico = parseFloat(document.getElementById("saldoFavorTecnico").value) || 0;
+  const saldoFavorLibre = parseFloat(document.getElementById("saldoFavorLibre").value) || 0;
 
   // Mandamos los datos a un Google Form oculto (ver el <form> al final del
   // body). Los Forms de Google aceptan respuestas sin login, así que esto
@@ -438,6 +456,8 @@ function guardarAjustes(token) {
   document.getElementById("campoFormPercepciones").value = percepciones;
   document.getElementById("campoFormRetenciones").value = retenciones;
   document.getElementById("campoFormIvaAduanero").value = ivaAduanero;
+  document.getElementById("campoFormSaldoFavorTecnico").value = saldoFavorTecnico;
+  document.getElementById("campoFormSaldoFavorLibre").value = saldoFavorLibre;
 
   const iframe = document.querySelector('iframe[name="iframeGuardarOculto"]');
 
